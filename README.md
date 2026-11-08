@@ -41,3 +41,7 @@ Copy-Item build/gpu/graphics/rexgpu-xenosrd.dll build/port-shadow-integer-fetch/
 Ejecutá `.\scripts\build_launcher.ps1` una vez y abrí **Jugar Rugby 2011.exe** desde la carpeta del proyecto. El lanzador usa los datos originales y activa la compilación síncrona de shaders. Las partidas, la caché y los registros se guardan en `work/`.
 
 El repositorio contiene el código del port y los parches. La imagen del disco, los archivos extraídos y las compilaciones quedan en tu equipo.
+
+### Autocompletar el código de extras
+
+Con el juego cerrado, ejecutá `python scripts/prepare_unlock_prefill.py` e ingresá tu código cuando se te pida. Al abrir **Enter Code** en el juego, el campo aparece prellenado y vos confirmás con Enter. El código se guarda en un archivo local bajo `work/updates/`, que Git ignora. Para volver al campo vacío, cerrá el juego y ejecutá `python scripts/prepare_unlock_prefill.py --clear`.
