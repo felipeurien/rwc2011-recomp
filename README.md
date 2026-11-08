@@ -44,4 +44,4 @@ El repositorio contiene el código del port y los parches. La imagen del disco, 
 
 ### Autocompletar el código de extras
 
-Con el juego cerrado, ejecutá `python scripts/prepare_unlock_prefill.py` e ingresá tu código cuando se te pida. Al abrir **Enter Code** en el juego, el campo aparece prellenado y vos confirmás con Enter. El código se guarda en un archivo local bajo `work/updates/`, que Git ignora. Para volver al campo vacío, cerrá el juego y ejecutá `python scripts/prepare_unlock_prefill.py --clear`.
+La compilación prepara automáticamente el código de extras incluido en el repositorio. Al abrir **Enter Code** en el juego, el campo aparece prellenado y vos confirmás con Enter. Si ya tenés el port compilado, podés activar el autocompletado con `python scripts/prepare_unlock_prefill.py`. Para quitarlo, cerrá el juego y ejecutá `python scripts/prepare_unlock_prefill.py --clear`. El archivo generado queda en `work/updates/`.

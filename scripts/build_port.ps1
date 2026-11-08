@@ -31,5 +31,7 @@ try {
     $buildCode = $LASTEXITCODE
     @{timestamp=(Get-Date -Format o);build_directory=$buildPath;configure_exit=$configureCode;build_exit=$buildCode;executable=(Join-Path $buildPath 'rugby2011.exe')} | ConvertTo-Json | Set-Content "$logBase-result.json"
     if ($buildCode -ne 0) { throw "Compilación fallida ($buildCode). Ver $logBase-build.log" }
+    & python (Join-Path $PSScriptRoot 'prepare_unlock_prefill.py')
+    if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar el autocompletado del código de extras.' }
     Write-Output "Ejecutable: $buildPath/rugby2011.exe (dependencias junto al ejecutable)."
 } finally { Pop-Location }
