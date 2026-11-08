@@ -1,0 +1,47 @@
+{
+  "repository": "xenia-project/xenia",
+  "commit": "95a5c3ee250f80c3b9d139658649d9ffb6db3eec",
+  "files": [
+    {
+      "path": "src/xenia/gpu/shaders/edram.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/edram.xesli",
+      "sha256": "7674150fd591f3600e21affb297e0570aaaf62fddba643d41899de8e6d606c09"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/endian.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/endian.xesli",
+      "sha256": "a2bae617ba27371d6b881808ab1fc29621ef043c83bde0ded8b70e2642743108"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/pixel_formats.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/pixel_formats.xesli",
+      "sha256": "3543d3d7137aa8f111e9f0558f094027a3385073f2225c9702378202de11331a"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/resolve.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/resolve.xesli",
+      "sha256": "e5054af6a9c5b453a5e281439443e7b61ce96e424d0a8edf937e83ee42073d44"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/resolve_full_32bpp.cs.xesl",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/resolve_full_32bpp.cs.xesl",
+      "sha256": "19246f74831ed204d0969f75e112556ff1682440679eca17dadd88dcca4e3d3e"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/resolve_full_32bpp.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/resolve_full_32bpp.xesli",
+      "sha256": "c539942a71da1ae35910549ebe5d19253f30995698bebd9a11ff6d818cff6b28"
+    },
+    {
+      "path": "src/xenia/gpu/shaders/texture_address.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/gpu/shaders/texture_address.xesli",
+      "sha256": "f72d04cb599cf9f607dff66b7e677b7cd8ac261ad2e29fb8556821c57fea4fd1"
+    },
+    {
+      "path": "src/xenia/ui/shaders/xesl.xesli",
+      "url": "https://raw.githubusercontent.com/xenia-project/xenia/95a5c3ee250f80c3b9d139658649d9ffb6db3eec/src/xenia/ui/shaders/xesl.xesli",
+      "sha256": "f7847e2cf76076e5f71ed5777aa9f33f1fe5b040448e19abe314619423b9c935"
+    }
+  ],
+  "compiler": "Windows SDK 10.0.26100.0 fxc, cs_5_1, /O3, SHADING_LANGUAGE_HLSL_XE=1"
+}

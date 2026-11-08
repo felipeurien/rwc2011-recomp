@@ -1,0 +1,38 @@
+--- a/src/graphics/pipeline/shader/dxbc_translator_fetch.cpp
++++ b/src/graphics/pipeline/shader/dxbc_translator_fetch.cpp
+@@ -1921,6 +1921,35 @@
+     // sampler filtering).
+     if (instr.opcode == FetchOpcode::kTextureFetch) {
+       assert_true(signs_temp != UINT32_MAX);
++      // Integer R16G16 fetches must undo normalization of the host SRV.
++      // Rugby's shadow receiver requests integer data (num_format = 1).
++      // Scaling after filtering preserves the guest's filtered integer values.
++      uint32_t integer_fetch_temp = PushSystemTemp();
++      a_.OpAnd(dxbc::Dest::R(integer_fetch_temp, 0b0001),
++               RequestTextureFetchConstantWord(tfetch_index, 3), dxbc::Src::LU(1));
++      a_.OpAnd(dxbc::Dest::R(integer_fetch_temp, 0b0010),
++               RequestTextureFetchConstantWord(tfetch_index, 1), dxbc::Src::LU(63));
++      a_.OpIEq(dxbc::Dest::R(integer_fetch_temp, 0b0010),
++               dxbc::Src::R(integer_fetch_temp, dxbc::Src::kYYYY),
++               dxbc::Src::LU(uint32_t(xenos::TextureFormat::k_16_16)));
++      a_.OpAnd(dxbc::Dest::R(integer_fetch_temp, 0b0001),
++               dxbc::Src::R(integer_fetch_temp, dxbc::Src::kXXXX),
++               dxbc::Src::R(integer_fetch_temp, dxbc::Src::kYYYY));
++      a_.OpIf(true, dxbc::Src::R(integer_fetch_temp, dxbc::Src::kXXXX));
++      for (uint32_t i = 0; i < 2; ++i) {
++        if (!(used_result_nonzero_components & (1 << i))) continue;
++        a_.OpIEq(dxbc::Dest::R(integer_fetch_temp, 0b0100),
++                 dxbc::Src::R(signs_temp).Select(i),
++                 dxbc::Src::LU(uint32_t(xenos::TextureSign::kSigned)));
++        a_.OpMovC(dxbc::Dest::R(integer_fetch_temp, 0b0100),
++                  dxbc::Src::R(integer_fetch_temp, dxbc::Src::kZZZZ),
++                  dxbc::Src::LF(32767.0f), dxbc::Src::LF(65535.0f));
++        a_.OpMul(dxbc::Dest::R(system_temp_result_, 1 << i),
++                 dxbc::Src::R(system_temp_result_).Select(i),
++                 dxbc::Src::R(integer_fetch_temp, dxbc::Src::kZZZZ));
++      }
++      a_.OpEndIf();
++      PopSystemTemp();
+       for (uint32_t i = 0; i < 4; ++i) {
+         if (!(used_result_nonzero_components & (1 << i))) {
+           continue;

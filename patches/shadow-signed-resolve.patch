@@ -1,0 +1,26 @@
+--- a/src/xenia/gpu/shaders/resolve_full_32bpp.xesli
++++ b/src/xenia/gpu/shaders/resolve_full_32bpp.xesli
+@@ -43,8 +43,21 @@
+       XeResolveColorCopySourcePixelAddressBytesYHalfPixelOffsetFilling(
+           resolve_info, pixel_index),
+       pixel_0, pixel_1, pixel_2, pixel_3);
+-  uint4_xe packed = XePack32bpp4Pixels(pixel_0, pixel_1, pixel_2, pixel_3,
+-                                       resolve_info.dest_format);
++  uint4_xe packed;
++  // Rugby uses signed-integer R16G16 resolves for variance shadow moments.
++  // Number format is independent of the texture format and exponent bias.
++  if (resolve_info.dest_format == kXenosFormat_16_16 &&
++      ((xe_resolve_dest_info >> 13u) & 7u) == 3u) {
++    int2_xe s0 = int2_xe(round(clamp(pixel_0.rg, -32768.0f, 32767.0f)));
++    int2_xe s1 = int2_xe(round(clamp(pixel_1.rg, -32768.0f, 32767.0f)));
++    int2_xe s2 = int2_xe(round(clamp(pixel_2.rg, -32768.0f, 32767.0f)));
++    int2_xe s3 = int2_xe(round(clamp(pixel_3.rg, -32768.0f, 32767.0f)));
++    packed = (uint4_xe(s0.r, s1.r, s2.r, s3.r) & 65535u) |
++             (uint4_xe(s0.g, s1.g, s2.g, s3.g) << 16u);
++  } else {
++    packed = XePack32bpp4Pixels(pixel_0, pixel_1, pixel_2, pixel_3,
++                              resolve_info.dest_format);
++  }
+   dont_flatten_xe
+   if (pixel_index.x == 0u &&
+       resolve_info.half_pixel_offset_fill_source.x != 0u) {
