@@ -1,0 +1,7 @@
+# Obtención experimental del SDK de Windows
+
+`get_windows_sdk.ps1 -Destination <carpeta nueva>` descarga directamente de Microsoft los seis instaladores y sus 25 archivos CAB fijados en `windows_sdk_packages.json` (192.762.644 bytes en total), verifica tamaño y SHA-256 y los extrae en una carpeta con `msiexec /a`. `-PackageCache <carpeta>` permite reutilizar archivos ya descargados y vuelve a verificar cada uno. No instala Visual Studio. La ejecución de prueba se hizo con integridad media, sin elevación, en esta PC.
+
+Se compararon los 181 archivos del SDK de Windows usados por el conjunto reducido anterior: todos estaban presentes y coincidieron byte por byte con los extraídos. Se repitió la generación y compilación completa del port en una exportación limpia, sustituyendo los archivos del SDK por los obtenidos de esos paquetes oficiales; el enlace terminó correctamente. Las demás herramientas seguían procediendo del conjunto local. El script también se ejecutó con PowerShell 5.1 usando la copia verificada de los paquetes.
+
+Esta prueba no demuestra que el SDK pueda usarse o redistribuirse en todas las condiciones: queda revisar los términos aplicables a la descarga, extracción y uso final. Tampoco se ha probado el procedimiento en otro Windows ni se ha integrado en el lanzador. La descarga y extracción ocupan más espacio que los archivos observados; no se ha demostrado que la lista de paquetes sea mínima.
