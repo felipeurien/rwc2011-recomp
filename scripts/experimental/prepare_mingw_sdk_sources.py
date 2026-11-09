@@ -15,12 +15,17 @@ SCRIPTS = Path(__file__).resolve().parent
 PATCHES = SCRIPTS.parents[1] / "patches"
 
 
-def git(*args, cwd=None, capture=False):
+def git(*args, cwd=None, capture=False, input_bytes=None):
     result = subprocess.run(
         ["git", "-c", "core.autocrlf=false", "-c", "core.symlinks=false", *args],
-        cwd=cwd, check=True, stdout=subprocess.PIPE if capture else None,
+        cwd=cwd, check=True, stdout=subprocess.PIPE if capture else None, input=input_bytes,
     )
     return result.stdout
+
+
+def apply_patch(source, filename, *options):
+    patch = (PATCHES / filename).read_bytes().replace(b"\r\n", b"\n")
+    git("apply", *options, "-", cwd=source, input_bytes=patch)
 
 
 def materialize_mspack_links(root):
@@ -52,8 +57,8 @@ def main():
     git("submodule", "update", "--init", "--depth", "1", "--jobs", "6", "--",
         *(f"thirdparty/{name}" for name in SUBMODULES), cwd=source)
 
-    git("apply", str(PATCHES / "experimental-rexglue-mingw.patch"), cwd=source)
-    git("apply", "--unidiff-zero", str(PATCHES / "experimental-mingw-jmp-alignment.patch"), cwd=source)
+    apply_patch(source, "experimental-rexglue-mingw.patch")
+    apply_patch(source, "experimental-mingw-jmp-alignment.patch", "--unidiff-zero")
     config = source / "thirdparty/FFmpeg/config_windows_x86_64.h"
     original = config.read_bytes()
     define = b"#define HAVE_LIBC_MSVCRT 1"
