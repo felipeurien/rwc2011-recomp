@@ -6,7 +6,6 @@ param(
 $ErrorActionPreference = 'Stop'
 $dest = [IO.Path]::GetFullPath($Destination)
 if (Test-Path -LiteralPath $dest) { throw "El destino ya existe: $dest" }
-if (!(Get-Command git.exe -ErrorAction SilentlyContinue)) { throw 'Se necesita Git para obtener las fuentes de ReXGlue.' }
 $parent = Split-Path $dest -Parent
 $work = Join-Path $parent ('.mingw-' + [guid]::NewGuid().ToString('N').Substring(0, 12))
 $stage = Join-Path $work 'toolset'
@@ -44,6 +43,10 @@ try {
     $build = Join-Path $work 'build'
     $cmake = Join-Path $stage 'cmake/bin/cmake.exe'
     $mingw = Join-Path $stage 'mingw/bin'
+    if (!(Get-Command git.exe -ErrorAction SilentlyContinue)) {
+        $gitBin = & (Join-Path $experimental 'get_mingit.ps1') -Destination (Join-Path $work 'git')
+        $env:Path = "$gitBin;$env:Path"
+    }
     & (Join-Path $stage 'python/python.exe') (Join-Path $experimental 'prepare_mingw_sdk_sources.py') $source
     if ($LASTEXITCODE -ne 0) { throw 'No se pudieron preparar las fuentes de ReXGlue.' }
 

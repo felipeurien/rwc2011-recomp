@@ -1,4 +1,5 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿param([switch]$PrepareOnly)
+$ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $launcher = Join-Path $root 'Jugar Rugby 2011.exe'
 try {
@@ -9,9 +10,6 @@ try {
         $mingwReady = Test-Path -LiteralPath $mingw -PathType Container
         $legacyReady = (Test-Path -LiteralPath $toolset -PathType Container) -and (Test-Path -LiteralPath $gpu -PathType Leaf)
         $useMingw = $mingwReady -or !$legacyReady
-        if ($useMingw -and !$mingwReady -and !(Get-Command git.exe -ErrorAction SilentlyContinue)) {
-            throw 'Se necesita Git para descargar las fuentes en la primera preparacion.'
-        }
         $isoFiles = @(Get-ChildItem -LiteralPath $root -Filter '*.iso' -File)
         if ($isoFiles.Count -eq 1) { $iso = $isoFiles[0].FullName }
         else {
@@ -28,7 +26,7 @@ try {
             & (Join-Path $PSScriptRoot 'prepare_playable.ps1') -Iso $iso -Toolset $toolset -CorrectedGpuPlugin $gpu
         }
     }
-    Start-Process -FilePath $launcher -WorkingDirectory $root
+    if (!$PrepareOnly) { Start-Process -FilePath $launcher -WorkingDirectory $root }
 } catch {
     Write-Host "No se pudo iniciar Rugby 2011: $($_.Exception.Message)" -ForegroundColor Red
     exit 1

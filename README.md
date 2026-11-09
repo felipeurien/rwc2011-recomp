@@ -4,7 +4,7 @@ Port experimental para Windows x64 de Rugby World Cup 2011 (Xbox 360), basado en
 
 ## Preparación automática experimental
 
-En Windows x64, abrí `Jugar Rugby 2011.cmd` y elegí tu ISO de Xbox 360. Si hay una sola ISO en la carpeta del proyecto, el lanzador la usa automáticamente. La primera preparación requiere Git disponible en la terminal y conexión a Internet. El lanzador descarga el extractor y las herramientas portables, verifica la revisión del disco y compila el juego. Este paso puede tardar varios minutos. Al terminar abre el juego y deja los guardados en `work/saves`.
+En Windows 10 u 11 de 64 bits, abrí `Jugar Rugby 2011.cmd` y elegí tu ISO de Xbox 360. Si hay una sola ISO en la carpeta del proyecto, el lanzador la usa automáticamente. La primera preparación requiere Internet. El lanzador descarga el extractor y las herramientas portables, incluido Git si hace falta, verifica la revisión del disco y compila el juego. Este paso puede tardar varios minutos. Al terminar abre el juego y deja los guardados en `work/saves`.
 
 El flujo sigue en prueba. Los resultados y lo que falta verificar están en [TOOLSET.md](scripts/experimental/TOOLSET.md).
 
