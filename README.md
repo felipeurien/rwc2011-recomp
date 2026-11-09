@@ -42,6 +42,8 @@ Ejecutá `.\scripts\build_launcher.ps1` una vez y abrí **Jugar Rugby 2011.exe**
 
 El repositorio contiene el código del port y los parches. La imagen del disco, los archivos extraídos y las compilaciones quedan en tu equipo.
 
+La investigación para reducir el entorno de compilación está en [PLAN_CLONAR_Y_JUGAR.md](PLAN_CLONAR_Y_JUGAR.md), con [scripts experimentales](scripts/experimental/README.md). Todavía no automatiza el flujo desde una ISO ni demuestra funcionamiento en Windows limpio.
+
 ### Autocompletar el código de extras
 
 La compilación prepara automáticamente el código de extras incluido en el repositorio. Al abrir **Enter Code** en el juego, el campo aparece prellenado y vos confirmás con Enter. Si ya tenés el port compilado, podés activar el autocompletado con `python scripts/prepare_unlock_prefill.py`. Para quitarlo, cerrá el juego y ejecutá `python scripts/prepare_unlock_prefill.py --clear`. El archivo generado queda en `work/updates/`.
