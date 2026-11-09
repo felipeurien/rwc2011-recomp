@@ -58,7 +58,13 @@ if (!(Test-Path -LiteralPath $overlay)) {
 $ready = Join-Path $stage 'playable'
 New-Item -ItemType Directory -Path $ready | Out-Null
 foreach ($file in $files) {
-    Copy-Item -LiteralPath (Join-Path $stage "build/mingw/$file") -Destination $ready
+    $inputFile = Join-Path $stage "build/mingw/$file"
+    if ($file -eq 'rugby2011.exe') {
+        & (Join-Path $tool 'mingw/bin/llvm-objcopy.exe') --strip-debug $inputFile (Join-Path $ready $file)
+        if ($LASTEXITCODE -ne 0) { throw 'No se pudo reducir el ejecutable.' }
+    } else {
+        Copy-Item -LiteralPath $inputFile -Destination $ready
+    }
 }
 [IO.Directory]::Move($ready, $target)
 & (Join-Path $PSScriptRoot 'build_launcher.ps1')
