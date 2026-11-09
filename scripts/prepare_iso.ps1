@@ -23,7 +23,7 @@ try {
     & $extractorPath -q -x -d $staging $isoPath
     if ($LASTEXITCODE -ne 0) { throw "Falló la extracción ($LASTEXITCODE)." }
     & (Join-Path $PSScriptRoot 'verify_game.ps1') -GameDirectory $staging
-    Move-Item -LiteralPath $staging -Destination $destinationPath
+    [IO.Directory]::Move($staging, $destinationPath)
     Write-Output "Copia del juego preparada: $destinationPath"
 } catch {
     Write-Warning "La extracción incompleta queda para inspección en: $staging"

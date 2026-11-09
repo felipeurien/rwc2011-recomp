@@ -21,23 +21,27 @@ internal static class RugbyLauncher
             }
 
             string root = AppDomain.CurrentDomain.BaseDirectory;
-            string build = Path.Combine(root, "build", "port-shadow-integer-fetch");
+            string mingwBuild = Path.Combine(root, "build", "mingw-playable");
+            bool useMingw = File.Exists(Path.Combine(mingwBuild, "rugby2011.exe"));
+            string build = useMingw ? mingwBuild : Path.Combine(root, "build", "port-shadow-integer-fetch");
             string executable = Path.Combine(build, "rugby2011.exe");
             string data = Path.Combine(root, "work");
-            string game = Path.Combine(data, "game");
+            string game = useMingw ? Path.Combine(root, "original", "game") : Path.Combine(data, "game");
             string saves = Path.Combine(data, "saves");
-            string cache = Path.Combine(data, "cache-integer-r16-v1");
+            string cache = Path.Combine(data, useMingw ? "cache-mingw-r16-v1" : "cache-integer-r16-v1");
             string updates = Path.Combine(data, "updates");
             string metadata = Path.Combine(data, "metadata");
             string logs = Path.Combine(data, "logs");
 
-            foreach (string file in new[] { executable, Path.Combine(game, "default.xex"),
-                Path.Combine(build, "rexgpu-xenosrd.dll"), Path.Combine(build, "rexruntimerd.dll"),
-                Path.Combine(build, "TracyClientrd.dll") })
+            string[] libraries = useMingw
+                ? new[] { "rexgpu-xenos.dll", "librexruntime.dll", "libc++.dll", "libunwind.dll" }
+                : new[] { "rexgpu-xenosrd.dll", "rexruntimerd.dll", "TracyClientrd.dll" };
+            foreach (string library in libraries)
             {
-                if (!File.Exists(file))
-                    throw new FileNotFoundException("Falta un archivo del juego:" + Environment.NewLine + file);
+                RequireFile(Path.Combine(build, library));
             }
+            RequireFile(executable);
+            RequireFile(Path.Combine(game, "default.xex"));
 
             foreach (string directory in new[] { saves, cache, updates, metadata, logs })
                 Directory.CreateDirectory(directory);
@@ -64,6 +68,12 @@ internal static class RugbyLauncher
             MessageBox.Show(error.Message, Title, MessageBoxButtons.OK, MessageBoxIcon.Error);
             return 1;
         }
+    }
+
+    private static void RequireFile(string path)
+    {
+        if (!File.Exists(path))
+            throw new FileNotFoundException("Falta un archivo del juego:" + Environment.NewLine + path);
     }
 
     private static string PathOption(string name, string path)

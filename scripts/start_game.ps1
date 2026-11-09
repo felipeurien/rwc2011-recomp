@@ -5,7 +5,9 @@ try {
     if (!(Test-Path -LiteralPath $launcher -PathType Leaf)) {
         $toolset = Join-Path $root 'tools/rugby-dependencies/toolset'
         $gpu = Join-Path $root 'tools/rugby-dependencies/graphics/rexgpu-xenosrd.dll'
-        if (!(Test-Path -LiteralPath $toolset -PathType Container) -or !(Test-Path -LiteralPath $gpu -PathType Leaf)) {
+        $mingw = Join-Path $root 'tools/rugby-dependencies/mingw-toolset'
+        $useMingw = Test-Path -LiteralPath $mingw -PathType Container
+        if (!$useMingw -and (!(Test-Path -LiteralPath $toolset -PathType Container) -or !(Test-Path -LiteralPath $gpu -PathType Leaf))) {
             throw 'Falta el paquete de preparación. Todavía no hay una descarga pública disponible; consultá PLAN_CLONAR_Y_JUGAR.md.'
         }
         $isoFiles = @(Get-ChildItem -LiteralPath $root -Filter '*.iso' -File)
@@ -18,7 +20,11 @@ try {
             if ($dialog.ShowDialog() -ne [Windows.Forms.DialogResult]::OK) { return }
             $iso = $dialog.FileName
         }
-        & (Join-Path $PSScriptRoot 'prepare_playable.ps1') -Iso $iso -Toolset $toolset -CorrectedGpuPlugin $gpu
+        if ($useMingw) {
+            & (Join-Path $PSScriptRoot 'prepare_mingw_playable.ps1') -Iso $iso -Toolset $mingw
+        } else {
+            & (Join-Path $PSScriptRoot 'prepare_playable.ps1') -Iso $iso -Toolset $toolset -CorrectedGpuPlugin $gpu
+        }
     }
     Start-Process -FilePath $launcher -WorkingDirectory $root
 } catch {
