@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory)][string]$Iso,
+    [string]$Iso,
     [Parameter(Mandatory)][string]$Toolset,
     [string]$Extractor
 )
@@ -24,6 +24,7 @@ if (Test-Path -LiteralPath $target) {
 }
 
 if (!(Test-Path -LiteralPath $game)) {
+    if (!$Iso) { throw 'Elegi una ISO para preparar los archivos del juego.' }
     if (!$Extractor) { $Extractor = & (Join-Path $PSScriptRoot 'get_extractor.ps1') }
     & (Join-Path $PSScriptRoot 'prepare_iso.ps1') -Iso $Iso -Extractor $Extractor
 } else {
