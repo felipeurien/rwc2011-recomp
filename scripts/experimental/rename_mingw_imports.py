@@ -1,24 +1,29 @@
 """Rename guest symbols in isolated, disposable MinGW experiment trees.
 
-Run after code generation and before building the SDK and port. This is not
-part of the playable setup: the resulting executable has not passed startup.
+Run on the SDK before building the generator, or on the port after code
+generation to update its native hooks and any previously generated sources.
 """
 import argparse
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--sdk", type=Path, required=True)
-parser.add_argument("--port", type=Path, required=True)
+parser.add_argument("--sdk", type=Path)
+parser.add_argument("--port", type=Path)
 args = parser.parse_args()
 
-roots = [args.sdk / "include", args.sdk / "src", args.port / "src",
-         args.port / "generated" / "default"]
+roots = []
+if args.sdk:
+    roots.extend(args.sdk / name for name in ("include", "src", "resources/templates"))
+if args.port:
+    roots.extend(args.port / name for name in ("src", "generated/default"))
+if not roots:
+    parser.error("select --sdk or --port")
 if any(not root.is_dir() for root in roots):
     parser.error("SDK, port and generated code must already exist")
 for root in roots:
     count = 0
     for path in root.rglob("*"):
-        if path.suffix not in {".cpp", ".h", ".hpp", ".inl"} or not path.is_file():
+        if path.suffix not in {".cpp", ".h", ".hpp", ".inl", ".inja"} or not path.is_file():
             continue
         original = path.read_bytes()
         modified = original.replace(b"__imp__", b"reximp__")
