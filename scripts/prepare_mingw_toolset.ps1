@@ -15,19 +15,16 @@ $savedProgress = $ProgressPreference
 try {
     $ProgressPreference = 'SilentlyContinue'
     New-Item -ItemType Directory -Path $work -Force | Out-Null
-    & (Join-Path $experimental 'get_build_utilities.ps1') -Destination $stage -PackageCache $PackageCache
+    $previous = @(Get-ChildItem -LiteralPath $parent -Directory -Force -Filter '.mingw-*' |
+        Where-Object { $_.FullName -ne $work -and $_.Name -match '^\.mingw-[0-9a-f]{12}$' } |
+        Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName)
+    $utilitiesCache = @($previous | ForEach-Object { Join-Path $_ 'toolset' })
+    & (Join-Path $experimental 'get_build_utilities.ps1') -Destination $stage -PackageCache $PackageCache -RetryCache $utilitiesCache
     $archive = Join-Path $work 'llvm-mingw-20251021.zip'
     $cached = if ($PackageCache) { Join-Path $PackageCache 'llvm-mingw-20251021.zip' } else { '' }
-    if ($cached -and (Test-Path -LiteralPath $cached -PathType Leaf)) {
-        Copy-Item -LiteralPath $cached -Destination $archive
-    } else {
-        Write-Host 'Descargando LLVM/MinGW...'
-        $url = 'https://github.com/mstorsjo/llvm-mingw/releases/download/20251021/llvm-mingw-20251021-ucrt-x86_64.zip'
-        Invoke-WebRequest -Uri $url -OutFile $archive -UseBasicParsing
-    }
-    if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne '0A0CE4733B54DE8C4858ECFC2A08447DE57728DCCF9FBF7FCBA3CE7E0D0C6AF8') {
-        throw 'La descarga de LLVM/MinGW no coincide con el hash esperado.'
-    }
+    $url = 'https://github.com/mstorsjo/llvm-mingw/releases/download/20251021/llvm-mingw-20251021-ucrt-x86_64.zip'
+    & (Join-Path $experimental 'get_verified_archive.ps1') -Destination $archive -Url $url `
+        -Sha256 '0A0CE4733B54DE8C4858ECFC2A08447DE57728DCCF9FBF7FCBA3CE7E0D0C6AF8' -Cached $cached -RetryCache $previous
     & (Join-Path $env:WINDIR 'System32/tar.exe') -xf $archive -C $work
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo extraer LLVM/MinGW.' }
     Move-Item -LiteralPath (Join-Path $work 'llvm-mingw-20251021-ucrt-x86_64') -Destination (Join-Path $stage 'mingw')
@@ -35,7 +32,8 @@ try {
     $fxc = Join-Path $work 'fxc'
     $cabinet = if ($PackageCache) { Join-Path $PackageCache 'sdk-tools.cab' } else { '' }
     if ($cabinet -and !(Test-Path -LiteralPath $cabinet -PathType Leaf)) { $cabinet = '' }
-    & (Join-Path $experimental 'get_shader_compiler.ps1') -Destination $fxc -Cabinet $cabinet
+    $fxcCache = @($previous | ForEach-Object { Join-Path $_ 'fxc' })
+    & (Join-Path $experimental 'get_shader_compiler.ps1') -Destination $fxc -Cabinet $cabinet -RetryCache $fxcCache
     $shader = Join-Path $stage 'shader'
     & (Join-Path $PSScriptRoot 'build_shadow_shader.ps1') -Fxc (Join-Path $fxc 'fxc.exe') -Destination $shader
 
@@ -44,7 +42,8 @@ try {
     $cmake = Join-Path $stage 'cmake/bin/cmake.exe'
     $mingw = Join-Path $stage 'mingw/bin'
     if (!(Get-Command git.exe -ErrorAction SilentlyContinue)) {
-        $gitBin = & (Join-Path $experimental 'get_mingit.ps1') -Destination (Join-Path $work 'git')
+        $gitCache = @($previous | ForEach-Object { Join-Path $_ 'git' })
+        $gitBin = & (Join-Path $experimental 'get_mingit.ps1') -Destination (Join-Path $work 'git') -RetryCache $gitCache
         $env:Path = "$gitBin;$env:Path"
     }
     & (Join-Path $stage 'python/python.exe') (Join-Path $experimental 'prepare_mingw_sdk_sources.py') $source

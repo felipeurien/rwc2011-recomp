@@ -1,6 +1,7 @@
 ﻿param(
     [Parameter(Mandatory)][string]$Destination,
-    [string]$PackageCache = ''
+    [string]$PackageCache = '',
+    [string[]]$RetryCache = @()
 )
 $ErrorActionPreference = 'Stop'
 $dest = [IO.Path]::GetFullPath($Destination)
@@ -14,9 +15,8 @@ $packages = @(
 foreach ($p in $packages) {
     $target = Join-Path $dest $p.Name
     $cached = if ($PackageCache) { Join-Path $PackageCache $p.Name } else { '' }
-    if ($cached -and (Test-Path -LiteralPath $cached -PathType Leaf)) { Copy-Item -LiteralPath $cached -Destination $target }
-    else { Write-Host "Descargando $($p.Name)..."; Invoke-WebRequest -Uri $p.Url -OutFile $target -UseBasicParsing }
-    if ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash -ne $p.Hash) { throw "Descarga incorrecta: $($p.Name)" }
+    & (Join-Path $PSScriptRoot 'get_verified_archive.ps1') -Destination $target -Url $p.Url -Sha256 $p.Hash `
+        -Cached $cached -RetryCache $RetryCache
 }
 $cmakeTemp = Join-Path $dest 'cmake-extract'
 Expand-Archive -LiteralPath (Join-Path $dest 'cmake.zip') -DestinationPath $cmakeTemp
