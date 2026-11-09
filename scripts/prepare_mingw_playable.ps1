@@ -61,3 +61,5 @@ foreach ($file in $files) {
 }
 [IO.Directory]::Move($ready, $target)
 & (Join-Path $PSScriptRoot 'build_launcher.ps1')
+try { & (Join-Path $PSScriptRoot 'remove_mingw_stage.ps1') -Parent (Split-Path $target -Parent) -Stage $stage }
+catch { Write-Warning "El juego esta listo. No se pudo limpiar $stage : $($_.Exception.Message)" }

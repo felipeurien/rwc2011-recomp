@@ -68,6 +68,8 @@ try {
     foreach ($name in @('cmake.zip', 'ninja.zip', 'python.zip')) { Remove-Item -LiteralPath (Join-Path $stage $name) }
     [IO.Directory]::Move($stage, $dest)
     Write-Output "Herramientas preparadas: $dest"
+    try { & (Join-Path $PSScriptRoot 'remove_mingw_stage.ps1') -Parent $parent -Stage $work }
+    catch { Write-Warning "Las herramientas estan listas. No se pudo limpiar $work : $($_.Exception.Message)" }
 } catch {
     Write-Warning "Preparacion incompleta en $work"
     throw
