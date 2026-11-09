@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$SourceRoot,
-    [Parameter(Mandatory)][string]$Patch
+    [Parameter(Mandatory)][string]$Patch,
+    [switch]$AllowApplied
 )
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($SourceRoot).TrimEnd('\','/')
@@ -27,6 +28,10 @@ $before = ($old -join "`n") + "`n"
 $after = ($new -join "`n") + "`n"
 $contents = [IO.File]::ReadAllText($target).Replace("`r`n", "`n")
 $index = $contents.IndexOf($before, [StringComparison]::Ordinal)
+if ($AllowApplied -and $index -lt 0) {
+    $applied = $contents.IndexOf($after, [StringComparison]::Ordinal)
+    if ($applied -ge 0 -and $contents.LastIndexOf($after, [StringComparison]::Ordinal) -eq $applied) { return }
+}
 if ($index -lt 0 -or $contents.LastIndexOf($before, [StringComparison]::Ordinal) -ne $index) { throw 'El contenido no coincide exactamente con el parche.' }
 $result = $contents.Substring(0, $index) + $after + $contents.Substring($index + $before.Length)
 [IO.File]::WriteAllText($target, $result, [Text.UTF8Encoding]::new($false))

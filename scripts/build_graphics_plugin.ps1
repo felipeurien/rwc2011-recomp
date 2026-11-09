@@ -62,5 +62,6 @@ try {
 }
 $plugin = Join-Path $build 'graphics/rexgpu-xenosrd.dll'
 if (!(Test-Path -LiteralPath $plugin -PathType Leaf)) { throw 'No se encontró el complemento gráfico compilado.' }
+& (Join-Path $PSScriptRoot 'verify_shadow_plugin.ps1') -Plugin $plugin -Shader (Join-Path $shaderDir 'resolve-full32-signed.dxbc')
 Write-Output "Complemento gráfico: $plugin"
 Write-Output "SHA-256: $((Get-FileHash -LiteralPath $plugin).Hash)"
