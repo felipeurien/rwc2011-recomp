@@ -22,9 +22,9 @@ $zipTool = Join-Path $dest '7zip'
 & (Join-Path $dest '7zr.exe') x (Join-Path $dest '7z2409-x64.exe') "-o$zipTool" -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo preparar el extractor de LLVM.' }
 $llvm = Join-Path $dest 'llvm'
-& (Join-Path $zipTool '7z.exe') x (Join-Path $dest 'LLVM-19.1.5-win64.exe') "-o$llvm" 'bin\clang++.exe' 'bin\lld-link.exe' 'bin\llvm-lib.exe' 'bin\llvm-rc.exe' 'lib\clang\19\include\*' -y | Out-Null
+& (Join-Path $zipTool '7z.exe') x (Join-Path $dest 'LLVM-19.1.5-win64.exe') "-o$llvm" 'bin\clang++.exe' 'bin\lld-link.exe' 'bin\llvm-lib.exe' 'bin\llvm-rc.exe' 'bin\llvm-mt.exe' 'lib\clang\19\include\*' -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo extraer LLVM.' }
-foreach ($file in @('bin/clang++.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-rc.exe','lib/clang/19/include/stdint.h')) {
+foreach ($file in @('bin/clang++.exe','bin/lld-link.exe','bin/llvm-lib.exe','bin/llvm-rc.exe','bin/llvm-mt.exe','lib/clang/19/include/stdint.h')) {
     if (!(Test-Path -LiteralPath (Join-Path $llvm $file) -PathType Leaf)) { throw "Falta un archivo de LLVM: $file" }
 }
 Write-Output "LLVM extraído: $llvm"
