@@ -46,7 +46,7 @@ Ejecutá `.\scripts\build_launcher.ps1` una vez y abrí **Jugar Rugby 2011.exe**
 
 El repositorio contiene el código del port y los parches. La imagen del disco, los archivos extraídos y las compilaciones quedan en tu equipo.
 
-La investigación para reducir el entorno de compilación está en [PLAN_CLONAR_Y_JUGAR.md](PLAN_CLONAR_Y_JUGAR.md), con [scripts experimentales](scripts/experimental/README.md). Todavía no automatiza el flujo desde una ISO ni demuestra funcionamiento en Windows limpio.
+La investigación para reducir el entorno de compilación está en [PLAN_CLONAR_Y_JUGAR.md](PLAN_CLONAR_Y_JUGAR.md), con [scripts experimentales](scripts/experimental/README.md). La preparación desde una ISO existe, pero todavía requiere proporcionar las dependencias indicadas arriba y no se ha demostrado en un Windows limpio.
 
 ### Autocompletar el código de extras
 
