@@ -1,0 +1,43 @@
+name: Verify graphics build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare development environment
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 Microsoft.VisualStudio.Component.VC.Llvm.Clang -property installationPath
+          if (!$vs) { throw 'Visual C++ build tools were not found on the runner.' }
+          $devcmd = Join-Path $vs 'Common7/Tools/VsDevCmd.bat'
+          $lines = & cmd.exe /c "`"$devcmd`" -arch=x64 -host_arch=x64 >nul && set"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the build environment.' }
+          foreach ($line in $lines) {
+            if ($line -match '^([^=]+)=(.*)$') {
+              $name, $value = $matches[1], $matches[2]
+              if (!$name.StartsWith('GITHUB_') -and !$name.StartsWith('RUNNER_') -and $name -notin @('CI','NODE_OPTIONS')) {
+                "{0}={1}" -f $name, $value >> $env:GITHUB_ENV
+              }
+            }
+          }
+          $llvm = Join-Path $vs 'VC/Tools/Llvm/x64/bin'
+          if (!(Test-Path (Join-Path $llvm 'clang-cl.exe'))) { throw 'clang-cl was not found on the runner.' }
+          $llvm >> $env:GITHUB_PATH
+      - name: Download verified ReXGlue SDK
+        shell: pwsh
+        run: ./scripts/get_rexglue_sdk.ps1 -Destination "$env:RUNNER_TEMP/rexglue-sdk"
+      - name: Rebuild graphics plugin
+        shell: pwsh
+        run: |
+          $fxc = "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.0.26100.0\x64\fxc.exe"
+          if (!(Test-Path $fxc)) { throw 'Windows SDK 10.0.26100.0 shader compiler was not found.' }
+          ./scripts/build_graphics_plugin.ps1 -Sdk "$env:RUNNER_TEMP/rexglue-sdk" -Fxc $fxc -Destination "$env:RUNNER_TEMP/graphics-build"

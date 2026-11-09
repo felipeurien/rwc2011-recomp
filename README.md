@@ -2,6 +2,10 @@
 
 Port experimental para Windows x64 de Rugby World Cup 2011 (Xbox 360), basado en la recompilación estática con [ReXGlue 0.10.0](https://github.com/rexglue/rexglue-sdk/releases/tag/v0.10.0). Usa las selecciones, camisetas y escudos originales. La versión probada llegó al campo, completó un partido y volvió al menú. También se verificó el guardado y la carga de un torneo.
 
+## Preparación automática experimental
+
+`Jugar Rugby 2011.cmd` puede detectar una ISO propia, descargar el extractor, verificar los archivos y preparar el juego. Todavía requiere que un conjunto portable de compilación esté en `tools/rugby-dependencies/toolset` y la DLL gráfica corregida en `tools/rugby-dependencies/graphics/rexgpu-xenosrd.dll`. No existe aún una descarga pública de ese conjunto: el flujo sigue en desarrollo y no es una instalación de un clic desde un clon limpio. La preparación solo acepta la revisión del juego inventariada. Al terminar abre el juego; los guardados se conservan en `work/saves`.
+
 ## Requisitos
 
 - Visual Studio 2022 Build Tools con las herramientas de C++ para x64, Clang, CMake 3.25 o posterior y Ninja.

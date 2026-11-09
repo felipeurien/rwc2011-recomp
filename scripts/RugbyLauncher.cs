@@ -24,7 +24,7 @@ internal static class RugbyLauncher
             string build = Path.Combine(root, "build", "port-shadow-integer-fetch");
             string executable = Path.Combine(build, "rugby2011.exe");
             string data = Path.Combine(root, "work");
-            string game = Path.Combine(root, "original", "game");
+            string game = Path.Combine(data, "game");
             string saves = Path.Combine(data, "saves");
             string cache = Path.Combine(data, "cache-integer-r16-v1");
             string updates = Path.Combine(data, "updates");
