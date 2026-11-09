@@ -6,9 +6,11 @@ try {
         $toolset = Join-Path $root 'tools/rugby-dependencies/toolset'
         $gpu = Join-Path $root 'tools/rugby-dependencies/graphics/rexgpu-xenosrd.dll'
         $mingw = Join-Path $root 'tools/rugby-dependencies/mingw-toolset'
-        $useMingw = Test-Path -LiteralPath $mingw -PathType Container
-        if (!$useMingw -and (!(Test-Path -LiteralPath $toolset -PathType Container) -or !(Test-Path -LiteralPath $gpu -PathType Leaf))) {
-            throw 'Falta el paquete de preparación. Todavía no hay una descarga pública disponible; consultá PLAN_CLONAR_Y_JUGAR.md.'
+        $mingwReady = Test-Path -LiteralPath $mingw -PathType Container
+        $legacyReady = (Test-Path -LiteralPath $toolset -PathType Container) -and (Test-Path -LiteralPath $gpu -PathType Leaf)
+        $useMingw = $mingwReady -or !$legacyReady
+        if ($useMingw -and !$mingwReady -and !(Get-Command git.exe -ErrorAction SilentlyContinue)) {
+            throw 'Se necesita Git para descargar las fuentes en la primera preparacion.'
         }
         $isoFiles = @(Get-ChildItem -LiteralPath $root -Filter '*.iso' -File)
         if ($isoFiles.Count -eq 1) { $iso = $isoFiles[0].FullName }

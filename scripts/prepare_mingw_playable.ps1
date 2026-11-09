@@ -5,7 +5,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$tool = (Resolve-Path -LiteralPath $Toolset).Path
+$tool = [IO.Path]::GetFullPath($Toolset)
 $game = Join-Path $root 'original/game'
 $shader = Join-Path $tool 'shader/resolve-full32-signed.dxbc'
 $sdk = Join-Path $tool 'rexglue'
@@ -23,13 +23,16 @@ if (Test-Path -LiteralPath $target) {
     return
 }
 
-& (Join-Path $PSScriptRoot 'verify_shadow_plugin.ps1') -Plugin (Join-Path $sdk 'bin/librexgpu-xenos.dll') -Shader $shader
 if (!(Test-Path -LiteralPath $game)) {
     if (!$Extractor) { $Extractor = & (Join-Path $PSScriptRoot 'get_extractor.ps1') }
     & (Join-Path $PSScriptRoot 'prepare_iso.ps1') -Iso $Iso -Extractor $Extractor
 } else {
     & (Join-Path $PSScriptRoot 'verify_game.ps1') -GameDirectory $game
 }
+if (!(Test-Path -LiteralPath $tool -PathType Container)) {
+    & (Join-Path $PSScriptRoot 'prepare_mingw_toolset.ps1') -Destination $tool
+}
+& (Join-Path $PSScriptRoot 'verify_shadow_plugin.ps1') -Plugin (Join-Path $sdk 'bin/librexgpu-xenos.dll') -Shader $shader
 
 # Build in a separate tree because MinGW changes the native hook sources.
 $stage = Join-Path $root ('build/.mingw-' + [guid]::NewGuid().ToString('N'))

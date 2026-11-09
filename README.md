@@ -4,9 +4,11 @@ Port experimental para Windows x64 de Rugby World Cup 2011 (Xbox 360), basado en
 
 ## Preparación automática experimental
 
-`Jugar Rugby 2011.cmd` puede detectar una ISO propia, descargar el extractor, verificar los archivos y preparar el juego. Todavía requiere que un conjunto portable de compilación esté en `tools/rugby-dependencies/toolset` y la DLL gráfica corregida en `tools/rugby-dependencies/graphics/rexgpu-xenosrd.dll`. No existe aún una descarga pública de ese conjunto: el flujo sigue en desarrollo y no es una instalación de un clic desde un clon limpio. La preparación solo acepta la revisión del juego inventariada. Al terminar abre el juego; los guardados se conservan en `work/saves`.
+En Windows x64, abrí `Jugar Rugby 2011.cmd` y elegí tu ISO de Xbox 360. Si hay una sola ISO en la carpeta del proyecto, el lanzador la usa automáticamente. La primera preparación requiere Git disponible en la terminal y conexión a Internet. El lanzador descarga el extractor y las herramientas portables, verifica la revisión del disco y compila el juego. Este paso puede tardar varios minutos. Al terminar abre el juego y deja los guardados en `work/saves`.
 
-## Requisitos
+El flujo sigue en prueba. Los resultados y lo que falta verificar están en [TOOLSET.md](scripts/experimental/TOOLSET.md).
+
+## Requisitos para la compilación manual con Visual Studio
 
 - Visual Studio 2022 Build Tools con las herramientas de C++ para x64, Clang, CMake 3.25 o posterior y Ninja.
 - Windows SDK 10.0.26100.0, Python 3 y Git.
@@ -46,7 +48,7 @@ Ejecutá `.\scripts\build_launcher.ps1` una vez y abrí **Jugar Rugby 2011.exe**
 
 El repositorio contiene el código del port y los parches. La imagen del disco, los archivos extraídos y las compilaciones quedan en tu equipo.
 
-La investigación para reducir el entorno de compilación está en [PLAN_CLONAR_Y_JUGAR.md](PLAN_CLONAR_Y_JUGAR.md), con [scripts experimentales](scripts/experimental/README.md). La preparación desde una ISO existe, pero todavía requiere proporcionar las dependencias indicadas arriba y no se ha demostrado en un Windows limpio.
+La investigación para reducir el entorno de compilación está en [PLAN_CLONAR_Y_JUGAR.md](PLAN_CLONAR_Y_JUGAR.md), con [scripts experimentales](scripts/experimental/README.md). La preparación automática todavía debe probarse de principio a fin en un Windows limpio.
 
 ### Autocompletar el código de extras
 

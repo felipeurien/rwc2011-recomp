@@ -61,6 +61,12 @@ def main():
         raise ValueError(f"Unexpected FFmpeg configuration: {config}")
     config.write_bytes(original.replace(define, b"#define HAVE_LIBC_MSVCRT 0"))
     materialize_mspack_links(source / "thirdparty/libmspack")
+    install = source / "cmake/rexglue_install.cmake"
+    contents = install.read_bytes()
+    marker = b"# Register in the CMake User Package Registry after install."
+    if contents.count(marker) != 1:
+        raise ValueError(f"Unexpected ReXGlue install rules: {install}")
+    install.write_bytes(contents.split(marker, 1)[0])
     subprocess.run([sys.executable, str(SCRIPTS / "rename_mingw_imports.py"),
                     "--sdk", str(source)], check=True)
     print(f"ReXGlue sources prepared: {source}")
