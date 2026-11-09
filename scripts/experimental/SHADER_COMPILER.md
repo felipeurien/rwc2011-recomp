@@ -1,0 +1,7 @@
+# Compilador de shaders experimental
+
+`get_shader_compiler.ps1 -Destination <carpeta nueva>` descarga el CAB fijado del SDK de Windows desde Microsoft, verifica su SHA-256 y usa `expand.exe` de Windows para extraer `fxc.exe` y `d3dcompiler_47.dll`, verificando ambos archivos. `-Cabinet` acepta una copia previamente descargada, que se verifica igual. El CAB ocupa 18.745.734 bytes; no se instala el SDK.
+
+Se probó la descarga y extracción con Windows PowerShell 5.1. El `fxc.exe` obtenido y su DLL coinciden byte por byte con los utilizados en la construcción gráfica anterior. Se usó esa copia para ejecutar `build_shadow_shader.ps1`, que generó el shader con el hash esperado. Aún falta reconstruir la DLL gráfica completa con herramientas portables y comprobar visualmente sus sombras.
+
+Los términos aplicables siguen pendientes de revisión. El [documento de licenciamiento de Visual Studio 2022](https://visualstudio.microsoft.com/wp-content/uploads/2023/07/Visual-Studio-Licensing-Whitepaper-July2023.pdf) describe restricciones de uso de Build Tools; no basta que la descarga sea técnicamente posible para concluir que este flujo se puede ofrecer a todos los usuarios. El compilador de shaders del SDK y los componentes de Build Tools requieren revisar sus términos específicos. Este script es una prueba local, no una conclusión legal ni un instalador publicado.
