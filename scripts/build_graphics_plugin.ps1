@@ -11,15 +11,16 @@ $destinationPath = [IO.Path]::GetFullPath($Destination)
 if (Test-Path -LiteralPath $destinationPath) { throw "El destino ya existe: $destinationPath" }
 New-Item -ItemType Directory -Path $destinationPath | Out-Null
 $source = Join-Path $destinationPath 'rexglue-source'
-& git -c core.autocrlf=false clone --depth 1 --branch v0.10.0 https://github.com/rexglue/rexglue-sdk.git $source
-if ($LASTEXITCODE -ne 0) { throw 'No se pudieron obtener las fuentes ReXGlue.' }
-$commit = (& git -C $source rev-parse HEAD).Trim()
-if ($commit -ne 'f5337cdc947ff6d4c4196737e2c807a48f2a1fc2') { throw "Versión inesperada de ReXGlue: $commit" }
-$patch = Join-Path $destinationPath 'shadow-integer-r16-fetch.patch'
-$patchText = [IO.File]::ReadAllText((Join-Path $root 'patches/shadow-integer-r16-fetch.patch')).Replace("`r`n", "`n")
-[IO.File]::WriteAllText($patch, $patchText, [Text.UTF8Encoding]::new($false))
-& git -C $source apply $patch
-if ($LASTEXITCODE -ne 0) { throw 'No se pudo aplicar el parche gráfico.' }
+$archive = Join-Path $destinationPath 'rexglue-source.zip'
+$commit = 'f5337cdc947ff6d4c4196737e2c807a48f2a1fc2'
+Write-Host 'Descargando fuentes ReXGlue...'
+Invoke-WebRequest -Uri "https://codeload.github.com/rexglue/rexglue-sdk/zip/$commit" -OutFile $archive -UseBasicParsing
+if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne 'E116DD1561F1E163600E6393D3C3DF12CEAF089771B23B41D0E572056E9DB394') { throw 'Las fuentes ReXGlue no coinciden con la versión fijada.' }
+$unpacked = Join-Path $destinationPath 'source-extract'
+Expand-Archive -LiteralPath $archive -DestinationPath $unpacked
+Move-Item -LiteralPath (Join-Path $unpacked "rexglue-sdk-$commit") -Destination $source
+Remove-Item -LiteralPath $unpacked
+& (Join-Path $PSScriptRoot 'apply_exact_patch.ps1') -SourceRoot $source -Patch (Join-Path $root 'patches/shadow-integer-r16-fetch.patch')
 $cmakeFile = Join-Path $source 'src/graphics/CMakeLists.txt'
 $cmakeText = [IO.File]::ReadAllText($cmakeFile)
 $alias = 'add_library(rex::gpu-xenos ALIAS rexgpu-xenos)'

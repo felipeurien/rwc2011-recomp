@@ -18,11 +18,7 @@ foreach ($file in $manifest.files) {
 }
 Push-Location $destinationPath
 try {
-    $patchText = [IO.File]::ReadAllText((Join-Path $root 'patches/shadow-signed-resolve.patch')).Replace("`r`n", "`n")
-    $patchPath = Join-Path $destinationPath 'shadow-signed-resolve.patch'
-    [IO.File]::WriteAllText($patchPath, $patchText, [Text.UTF8Encoding]::new($false))
-    & git apply $patchPath
-    if ($LASTEXITCODE -ne 0) { throw 'No se pudo aplicar el parche de sombras.' }
+    & (Join-Path $PSScriptRoot 'apply_exact_patch.ps1') -SourceRoot $destinationPath -Patch (Join-Path $root 'patches/shadow-signed-resolve.patch')
     $shader = Join-Path $destinationPath 'resolve-full32-signed.dxbc'
     & $fxcPath /T cs_5_1 /E main /O3 /D SHADING_LANGUAGE_HLSL_XE=1 /I $destinationPath /Fo $shader (Join-Path $destinationPath 'src/xenia/gpu/shaders/resolve_full_32bpp.cs.xesl')
     if ($LASTEXITCODE -ne 0) { throw 'No se pudo compilar el shader.' }
