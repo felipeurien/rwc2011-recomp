@@ -26,6 +26,9 @@ else()
 endif()
 
 rexglue_setup_target(rugby2011 GPU_PLUGINS xenos)
+if(MINGW)
+    target_link_options(rugby2011 PRIVATE -municode)
+endif()
 
 option(RUGBY_BUILD_CAPTURE_TOOL "Build an optional manual GPU capture host" OFF)
 if(RUGBY_BUILD_CAPTURE_TOOL)

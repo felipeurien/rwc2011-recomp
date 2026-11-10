@@ -1,0 +1,24 @@
+# Revisión de componentes del candidato local
+
+Estado: **no publicar**. Este inventario identifica evidencia técnica y
+preguntas de distribución; no es una conclusión legal. Corresponde al
+candidato local `rugby-candidato-bootstrap-a897681897ab47a794ee0c62432670d2.zip`
+y al SDK MinGW reconstruido desde ReXGlue `f5337cdc947ff6d4c4196737e2c807a48f2a1fc2`.
+
+| Componente | Evidencia y avisos encontrados | Pendiente antes de publicar |
+| --- | --- | --- |
+| ReXGlue y código derivado de Xenia | El SDK incluye un aviso BSD en `REXGLUE.txt`. Las licencias de terceros no quedan cubiertas por ese aviso. | Revisar cada componente incluido y sus avisos. |
+| Desensamblador PowerPC de binutils | [`ppc-dis.c` del commit fijado](https://raw.githubusercontent.com/rexglue/rexglue-sdk/f5337cdc947ff6d4c4196737e2c807a48f2a1fc2/thirdparty/disasm/ppc-dis.c) contiene avisos GPL, incluidos GPL v2 o posterior. `rexcodegen` enlaza `disasm` y `llvm-nm` encontró `print_insn_ppc`, `print_insn_powerpc` y `powerpc_opcodes` en `rexglue.exe` del candidato. El ejecutable examinado coincide por SHA-256 con el del ZIP. | Incluir los avisos aplicables y asegurar fuentes correspondientes, instrucciones y condiciones adecuadas para el generador y sus dependencias. Revisar el alcance y compatibilidad; no inferir que el aviso BSD principal basta. La [FAQ de GPL v2 de GNU](https://www.gnu.org/licenses/old-licenses/gpl-2.0-faq.html) explica la disponibilidad de las fuentes correspondientes para binarios. |
+| FFmpeg | `libavcodec` y `libavutil` están enlazadas estáticamente en `librexruntime.dll`. La configuración inspeccionada tiene `CONFIG_GPL=0`, `CONFIG_NONFREE=0` y `CONFIG_VERSION3=0`. Se reunieron el aviso de FFmpeg y LGPL 2.1. | Revisar la configuración y todos los archivos efectivamente enlazados; verificar fuentes correspondientes, avisos y mecanismo de sustitución para la distribución concreta. |
+| libmspack | `lzxd.c` se enlaza estáticamente en `librexruntime.dll`; el árbol fijado incluye LGPL 2.1. | Revisar las mismas cuestiones de fuentes, avisos y sustitución. |
+| AES-128 de `thirdparty/aes_128` | El [archivo LICENSE del commit fijado](https://raw.githubusercontent.com/rexglue/rexglue-sdk/f5337cdc947ff6d4c4196737e2c807a48f2a1fc2/thirdparty/aes_128/LICENSE) contiene MIT; la cabecera de `aes.c` identifica también a Chinese Academy of Sciences. Se conservaron ambos avisos sin resolver su procedencia. | Revisar la relación entre esos avisos y la procedencia del código antes de distribuir. |
+| tiny-AES-c | Los tres archivos vendorizados (`aes.c`, `aes.h`, `aes.hpp`) tienen exactamente los mismos blobs Git que el commit [`23856752fbd139da0b8ca6e471a13d5bcc99a08d`](https://github.com/kokke/tiny-AES-c/tree/23856752fbd139da0b8ca6e471a13d5bcc99a08d); ese árbol incluye [`unlicense.txt`](https://github.com/kokke/tiny-AES-c/blob/23856752fbd139da0b8ca6e471a13d5bcc99a08d/unlicense.txt), ahora conservado entre los avisos. | Revisar la aplicación de ese texto a la distribución concreta y las demás dependencias del ejecutable. |
+| disruptorplus | Diez de las once cabeceras vendorizadas coinciden exactamente con [`xenia-project/disruptorplus` en `5787e9cb7551c8c79cf9ce14f7be860dc907e9a4`](https://github.com/xenia-project/disruptorplus/tree/5787e9cb7551c8c79cf9ce14f7be860dc907e9a4). La restante difiere en una línea incorporada por el [commit `01d5954` de ReXGlue](https://github.com/rexglue/rexglue-sdk/commit/01d595483ccd043e56e7adaccae454e54f252764), ancestro de la versión fijada. El [`LICENSE.txt` de Xenia](https://github.com/xenia-project/disruptorplus/blob/5787e9cb7551c8c79cf9ce14f7be860dc907e9a4/LICENSE.txt) coincide byte por byte con el aviso MIT de Lewis Baker ya incluido. | Revisar la aplicación de los avisos y condiciones a la copia modificada y la distribución concreta; la trazabilidad técnica no sustituye la revisión completa. |
+| SDL3, tomlplusplus y otros terceros | El SDK contiene el aviso de SDL3; se reunieron avisos de tomlplusplus, fmt, spdlog, simde y otros en `release-licenses`. | Confirmar que la lista cubre todos los componentes realmente incluidos y sus condiciones. |
+| CMake, Ninja, Python y LLVM/MinGW | El candidato contiene las distribuciones oficiales fijadas. CMake, Python y LLVM/MinGW incluyen avisos en sus propios árboles; Ninja tiene un aviso reunido aparte. | Revisar versiones, avisos y fuentes que correspondan a las distribuciones exactas. |
+| Extractor y shader | El extractor y su licencia se fijan por hash; el complemento contiene el shader corregido. El shader se construyó con fxc de un SDK local. | Revisar procedencia y condiciones aplicables al extractor, shader y herramientas de construcción. |
+
+El kit local de fuentes y reconstrucción permite reconstruir el SDK y probar
+la sustitución de FFmpeg y libmspack. Todavía debe verificarse que sea la
+fuente correspondiente completa para todos los binarios y que la forma de
+distribución elegida satisfaga las condiciones aplicables.

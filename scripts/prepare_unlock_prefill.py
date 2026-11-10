@@ -45,6 +45,11 @@ def main():
         patched = prefill(original, EXTRAS_CODE)
     except ValueError as error:
         parser.error(str(error))
+    if destination.exists():
+        if destination.read_bytes() == patched:
+            print("Local prefill already prepared.")
+            return
+        parser.error("The existing extras overlay differs; it was not replaced: " + str(destination))
     destination.parent.mkdir(parents=True, exist_ok=True)
     with NamedTemporaryFile(dir=destination.parent, delete=False) as temporary:
         temporary_path = Path(temporary.name)

@@ -1,0 +1,2 @@
+# Los avisos se verifican por SHA-256; conservar sus bytes en cualquier plataforma.
+analysis/release-licenses/** -text

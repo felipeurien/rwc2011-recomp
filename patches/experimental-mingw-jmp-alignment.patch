@@ -1,0 +1,16 @@
+diff --git a/resources/templates/codegen/pch_h.inja b/resources/templates/codegen/pch_h.inja
+index 68274d2..3db63e9 100644
+--- a/resources/templates/codegen/pch_h.inja
++++ b/resources/templates/codegen/pch_h.inja
+@@ -269,2 +269,3 @@ extern PPCFuncMapping PPCFuncMappings[];
+-inline std::unordered_map<u32, jmp_buf>& get_jmp_buf_map() {
+-  static thread_local std::unordered_map<u32, jmp_buf> map;
++struct alignas(16) aligned_jmp_buf { jmp_buf value; };
++inline std::unordered_map<u32, aligned_jmp_buf>& get_jmp_buf_map() {
++  static thread_local std::unordered_map<u32, aligned_jmp_buf> map;
+@@ -274 +275 @@ inline std::unordered_map<u32, jmp_buf>& get_jmp_buf_map() {
+-#define ppc_setjmp(guest_buf_addr) (setjmp(::get_jmp_buf_map()[(guest_buf_addr)]))
++#define ppc_setjmp(guest_buf_addr) (setjmp(::get_jmp_buf_map()[(guest_buf_addr)].value))
+@@ -280 +281 @@ inline std::unordered_map<u32, jmp_buf>& get_jmp_buf_map() {
+-    longjmp(it->second, val);
++    longjmp(it->second.value, val);

@@ -21,20 +21,40 @@ internal static class RugbyLauncher
             }
 
             string root = AppDomain.CurrentDomain.BaseDirectory;
-            string build = Path.Combine(root, "build", "port-shadow-integer-fetch");
+            string mingwBuild = Path.Combine(root, "build", "mingw-playable");
+#if SELECTION_KITS
+            bool useMingw = false;
+#else
+            bool useMingw = File.Exists(Path.Combine(mingwBuild, "preparado.json"));
+#endif
+            string build = useMingw ? mingwBuild : Path.Combine(root, "build", "port-shadow-integer-fetch");
             string executable = Path.Combine(build, "rugby2011.exe");
             string data = Path.Combine(root, "work");
-            string game = Path.Combine(root, "original", "game");
+#if SELECTION_KITS
+            data = Path.Combine(data, "mods", "selecciones-2026");
+#endif
+            string game = Path.Combine(data, "game");
+#if !SELECTION_KITS
+            if (!useMingw && !Directory.Exists(game))
+                game = Path.Combine(root, "original", "game");
+#endif
             string saves = Path.Combine(data, "saves");
-            string cache = Path.Combine(data, "cache-integer-r16-v1");
+            string cache = Path.Combine(data, useMingw ? "cache-mingw-r16-v1" : "cache-integer-r16-v1");
             string updates = Path.Combine(data, "updates");
             string metadata = Path.Combine(data, "metadata");
             string logs = Path.Combine(data, "logs");
 
-            foreach (string file in new[] { executable, Path.Combine(game, "default.xex"),
-                Path.Combine(build, "rexgpu-xenosrd.dll"), Path.Combine(build, "rexruntimerd.dll"),
-                Path.Combine(build, "TracyClientrd.dll") })
+            string[] libraries = useMingw
+                ? new[] { "rexgpu-xenos.dll", "librexruntime.dll", "libc++.dll", "libunwind.dll" }
+                : new[] { "rexgpu-xenosrd.dll", "rexruntimerd.dll", "TracyClientrd.dll" };
+            foreach (string file in new[] { executable, Path.Combine(game, "default.xex") })
             {
+                if (!File.Exists(file))
+                    throw new FileNotFoundException("Falta un archivo del juego:" + Environment.NewLine + file);
+            }
+            foreach (string library in libraries)
+            {
+                string file = Path.Combine(build, library);
                 if (!File.Exists(file))
                     throw new FileNotFoundException("Falta un archivo del juego:" + Environment.NewLine + file);
             }
